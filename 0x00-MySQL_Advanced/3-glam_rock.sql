@@ -1,7 +1,7 @@
 -- Lists all bands with Glam rock as main style
 
-SELECT band_name,
-       (YEAR(COALESCE(split, NOW())) - YEAR(COALESCE(formed, NOW()))) AS lifespan
+SELECT band_name, DIFFERENCE(split, formed) AS lifespan
 FROM metal_bands
-WHERE style LIKE '%Glam rock%'
+WHERE style='Glam rock'
+GROUP BY band_name
 ORDER BY lifespan DESC;

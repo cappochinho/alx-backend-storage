@@ -5,8 +5,9 @@ Redis Basic Exercise
 """
 
 import redis
-from uuid import uuid4
+import uuid
 from typing import Union
+
 
 class Cache:
     """
@@ -16,11 +17,12 @@ class Cache:
     def __init__(self):
         """initializes an instance of Cache"""
 
-        self._redis = redis.Redis().flushdb()
+        self._redis = redis.Redis()
+        self._redis.flushdb()
 
     def store(data: Union[str, bytes, int, float]) -> str:
         """takes a data argument and returns a str"""
 
-        key = str(uuid4())
+        key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key

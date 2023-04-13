@@ -37,15 +37,14 @@ def call_history(method: Callable) -> Callable:
 
     @wraps(method)
     def wrapper(self, *args) -> Union[str, int]:
-        """
-        Wrapper for logging function
-        """
-
+        '''wrapper to add the call history'''
         key = method.__qualname__
         self._redis.rpush(f"{key}:inputs", str(args))
-        ts = method(self, *args)
-        self._redis.rpush(f"{key}:outputs", ts)
-        return ts
+        op = method(self, *args)
+        self._redis.rpush(f"{key}:outputs", op)
+        return op
+
+    return wrapper
 
     return wrapper
 

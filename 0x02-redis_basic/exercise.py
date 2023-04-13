@@ -46,7 +46,21 @@ def call_history(method: Callable) -> Callable:
 
     return wrapper
 
-    return wrapper
+
+def replay(fn: Callable) -> str:
+    """
+    Displays the history of calls of a passed function
+    """
+
+    method = fn.__qualname__
+    inputs = f"{method}:inputs"
+    outputs = f"{method}:outputs"
+    inp_list = fn.__self__._redis.lrange(inputs, 0, -1)
+    out_list = fn.__self__._redis.lrange(outputs, 0, -1)
+    Q = fn.__self__._redis.get(method).decode('utf-8')
+    print(f"{method} was called {Q} times:")
+    for inp, out in zip(inp_list, out_list):
+        print(f"{method}(*{inp.decode('utf-8')}) -> {out.decode('utf-8')}")
 
 
 class Cache:
@@ -60,6 +74,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @call_history
     @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """takes a data argument and returns a str"""

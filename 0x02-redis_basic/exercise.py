@@ -30,6 +30,26 @@ def count_calls(method: Callable) -> Callable:
     return wrapper
 
 
+def call_history(method: Callable) -> Callable:
+    """
+    Keeps records of input parameters and results of functions
+    """
+
+    @wraps(method)
+    def wrapper(self, *args) -> Union[str, int]:
+        """
+        Wrapper for logging function
+        """
+
+        key = method.__qualname__
+        self._redis.rpush(f"{key}:inputs", str(args))
+        ts = method(self, *args)
+        self._redis.rpush(f"{key}:outputs", ts)
+        return ts
+
+    return wrapper
+
+
 class Cache:
     """
     A Cache class based on Redis
